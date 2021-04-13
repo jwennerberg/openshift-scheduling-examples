@@ -1,0 +1,59 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: hello
+  labels:
+    app: hello
+    app.kubernetes.io/component: hello
+    app.kubernetes.io/instance: hello
+    app.kubernetes.io/part-of: hello-pod-anti-affinity
+    app.openshift.io/runtime: golang
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: hello
+  template:
+    metadata:
+      labels:
+        app: hello
+    spec:
+      containers:
+        - name: hello
+          image: quay.io/jwennerberg/hello:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /hello
+              port: 8080
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /hello
+              port: 8080
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - hello
+              topologyKey: topology.kubernetes.io/zone

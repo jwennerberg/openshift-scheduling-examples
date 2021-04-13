@@ -1,0 +1,57 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: hello-na-a
+  labels:
+    app: hello-na-a
+    app.kubernetes.io/component: hello-na-a
+    app.kubernetes.io/instance: hello-na-a
+    app.kubernetes.io/part-of: hello-node-affinity
+    app.openshift.io/runtime: golang
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: hello-na-a
+  template:
+    metadata:
+      labels:
+        app: hello-na-a
+        deployment: hello-na
+    spec:
+      containers:
+        - name: hello
+          image: quay.io/jwennerberg/hello:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /hello
+              port: 8080
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /hello
+              port: 8080
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: topology.kubernetes.io/zone
+                operator: In
+                values:
+                - eu-west-1a
