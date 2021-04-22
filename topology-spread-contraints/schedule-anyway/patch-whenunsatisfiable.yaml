@@ -1,0 +1,17 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: hello
+  labels:
+    app: hello
+    app.kubernetes.io/component: hello
+    app.kubernetes.io/instance: hello
+    app.kubernetes.io/part-of: hello-topology-spread-constraints
+    app.openshift.io/runtime: golang
+spec:
+  template:
+    spec:
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: ScheduleAnyway
