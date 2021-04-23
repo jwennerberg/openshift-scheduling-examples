@@ -5,3 +5,6 @@ namespace: hello
 
 bases:
   - ../base
+
+patchesStrategicMerge:
+  - patch-whenunsatisfiable.yaml
