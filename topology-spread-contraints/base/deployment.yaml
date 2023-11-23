@@ -29,7 +29,7 @@ spec:
               protocol: TCP
           readinessProbe:
             httpGet:
-              path: /hello
+              path: /healthz
               port: 8080
               scheme: HTTP
             timeoutSeconds: 1
@@ -38,7 +38,7 @@ spec:
             failureThreshold: 3
           livenessProbe:
             httpGet:
-              path: /hello
+              path: /healthz
               port: 8080
               scheme: HTTP
             timeoutSeconds: 1
